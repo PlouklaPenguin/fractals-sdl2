@@ -2,8 +2,8 @@ extern crate sdl2;
 
 #[derive(Clone, Copy)]
 pub struct Complex {
-    r: f32,
-    i: f32,
+    r: f64,
+    i: f64,
 }
 
 impl core::fmt::Display for Complex {
@@ -24,25 +24,20 @@ impl std::ops::Add for Complex {
 }
 
 impl Complex {
-    pub fn new(r: f32, i: f32) -> Complex {
+    pub fn new(r: f64, i: f64) -> Self {
         Complex { r, i }
     }
 
-    pub fn square(&self) -> Complex {
-        Complex {
-            r: (self.r.powi(2)) - (self.i.powi(2)),
-            i: 2.0 * self.r * self.i,
-        }
+    pub fn square(&self) -> Self {
+        Complex::new((self.r.powi(2)) - (self.i.powi(2)), 2.0 * self.r * self.i)
+    }
+
+    pub fn distance(&self, b: Self) -> f64 {
+        ((self.r + b.r).powi(2) + (self.i + b.i).powi(2)).sqrt()
     }
 }
 
 /*
-    TODO: Ask Eric why this doesn't work and what the err means
-impl Canvas<Window> {
-    pub fn draw_big_point(&self, point: P, size: u8) where P: Into<Point> {
-
-    }
-}*/
 mod custom_draw {
     use sdl2::{rect::Point, rect::Rect, render::Canvas, video::Window};
 
@@ -57,42 +52,38 @@ mod custom_draw {
         Ok(())
     }
 }
-
-mod math {
-    use super::Complex;
-
-    pub fn distance(a: Complex, b: Complex) -> f32 {
-        ((a.r + b.r).powi(2) + (a.i + b.i).powi(2)).sqrt()
-    }
-}
+*/
 
 pub mod mandelbrot {
     use sdl2::{pixels::Color, render::Canvas, video::Window};
 
-    use super::{math, Complex};
+    use super::Complex;
 
     pub fn generate_window(
-        depth: i32,
-        screen_width: i32,
-        screen_height: i32,
+        depth: u32,
+        screen_width: i128,
+        screen_height: i128,
         canvas: &mut Canvas<Window>,
     ) -> Result<(), String> {
-        let screen_width = screen_width * (10 ^ depth);
-        let screen_height = screen_height * (10 ^ depth);
+        //let screen_width = screen_width * 10_i128.pow(depth);
+        //println!("{}", screen_width);
+        //let screen_height = screen_height * (10_i128.pow(depth));
         canvas.set_draw_color(Color::RGB(255, 255, 255));
 
-        for x in (screen_width / -2)..(screen_width / 2 - 1) {
-            for y in (screen_width / -2)..(screen_height / 2 - 1) {
-                if is_in_set(super::Complex {
-                    r: (x as f32) / ((10 ^ depth) as f32),
-                    i: (y as f32) / ((10 ^ depth) as f32),
-                }) {
+        // -1 to 1
+        #[allow(clippy::identity_op)]
+        let yrange: i32 = 1 * (2_i32.pow(depth));
+        // -2 to 2
+        let xrange = 2 * (2_i32.pow(depth));
+
+        for x in -xrange..xrange {
+            for y in -yrange..yrange  {
+                if is_in_set(Complex::new(
+                    (x as f64) / ((2_i128.pow(depth)) as f64),
+                    (y as f64) / ((2_i128.pow(depth)) as f64),
+                )) {
                     canvas.draw_point(((x + 400) as i32, (y + 300) as i32))?;
-                    println!(
-                        "x = {} y = {}",
-                        (x as f32) / ((10 ^ depth) as f32),
-                        (y as f32) / ((10 ^ depth) as f32)
-                    );
+                    println!("x = {} y = {}", (x as f64), (y as f64));
                 }
                 //canvas.present();
             }
@@ -101,12 +92,12 @@ pub mod mandelbrot {
         Ok(())
     }
     pub fn is_in_set(constant: Complex) -> bool {
-        let mut e = Complex { r: 0.0, i: 0.0 } + constant;
+        let mut e = Complex::new(0.0, 0.0) + constant;
 
         for _i in 0..16 {
             e = mandel(e, constant);
         }
-        math::distance(e, Complex { r: 0.0, i: 0.0 }) <= 1.0
+        e.distance(Complex::new(0.0, 0.0)) <= 1.0
     }
 
     fn mandel(i: Complex, constant: Complex) -> Complex {

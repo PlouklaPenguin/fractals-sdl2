@@ -9,7 +9,10 @@ static WINDOW_HEIGHT: u32 = 600;
 
 mod fractals;
 use fractals::{mandelbrot, Complex};
-use std::{env, num::ParseFloatError};
+use std::{
+    env,
+    num::{ParseFloatError, ParseIntError},
+};
 
 fn main() -> Result<(), String> {
     let args: Vec<String> = env::args().collect();
@@ -34,8 +37,14 @@ fn main() -> Result<(), String> {
 
             canvas.set_draw_color(Color::RGB(0, 0, 0));
             canvas.clear();
+            canvas.present();
             canvas.set_draw_color(Color::RGB(255, 255, 255));
-            mandelbrot::generate_window(4, WINDOW_WIDTH as i32, WINDOW_HEIGHT as i32, &mut canvas)?;
+            mandelbrot::generate_window(
+                args[2].parse().map_err(|e: ParseIntError| e.to_string())?,
+                800/*WINDOW_WIDTH as i128*/,
+                WINDOW_HEIGHT as i128,
+                &mut canvas,
+            )?;
 
             'running: loop {
                 for event in event_pump.poll_iter() {
@@ -80,5 +89,3 @@ fn main() -> Result<(), String> {
 
     Ok(())
 }
-
-
