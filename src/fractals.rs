@@ -58,11 +58,10 @@ pub mod mandelbrot {
     use sdl2::{pixels::Color, render::Canvas, video::Window};
 
     use super::Complex;
-
     pub fn generate_window(
         depth: u32,
-        screen_width: i128,
-        screen_height: i128,
+        _screen_width: i128,
+        _screen_height: i128,
         canvas: &mut Canvas<Window>,
     ) -> Result<(), String> {
         //let screen_width = screen_width * 10_i128.pow(depth);
@@ -70,22 +69,32 @@ pub mod mandelbrot {
         //let screen_height = screen_height * (10_i128.pow(depth));
         canvas.set_draw_color(Color::RGB(255, 255, 255));
 
-        // -1 to 1
-        #[allow(clippy::identity_op)]
-        let yrange: i32 = 1 * (2_i32.pow(depth));
+        // take distance on y axis (2) and multiply it by 2^x to expand it to an int
+        let yrange: i32 = 2 * (2_i32.pow(depth));
         // -2 to 2
-        let xrange = 2 * (2_i32.pow(depth));
+        let xrange = 4 * (2_i32.pow(depth));
+        println!("xrange: {} yrange: {}", xrange, yrange);
 
+        // For every value in between -2 and 2
+        /*
+        TODO: Make the for loop such that it only draws points between 0 and 400 / 0 and 300
+        This needs to
+        */
         for x in -xrange..xrange {
-            for y in -yrange..yrange  {
-                if is_in_set(Complex::new(
-                    (x as f64) / ((2_i128.pow(depth)) as f64),
-                    (y as f64) / ((2_i128.pow(depth)) as f64),
-                )) {
-                    canvas.draw_point(((x + 400) as i32, (y + 300) as i32))?;
-                    println!("x = {} y = {}", (x as f64), (y as f64));
+            for y in -yrange..yrange {
+                if x < 0 && x >= -400 && y < 0 && y >= -300 {
+                    if is_in_set(Complex::new(
+                        (x as f64) / ((2_i128.pow(depth)) as f64),
+                        (y as f64) / ((2_i128.pow(depth)) as f64),
+                    )) {
+                        canvas.draw_point(((x + 400) as i32, (y + 300) as i32))?;
+                        if x == -2 && y == 0 {
+                            println!("oh");
+                        }
+                        //println!("x = {} y = {}", (x as f64), (y as f64));
+                    }
+                    //canvas.present();
                 }
-                //canvas.present();
             }
         }
 
