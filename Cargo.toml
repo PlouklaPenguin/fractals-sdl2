@@ -10,4 +10,4 @@ sdl2 = "0.35"
 #[dependencies.sdl2]
 #version = "0.35"
 #default-features = false
-#features = ["ttf","image","gfx","mixer"]
+# features = ["use_mac_framework"]

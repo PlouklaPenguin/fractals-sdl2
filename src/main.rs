@@ -33,18 +33,11 @@ fn main() -> Result<(), String> {
                 .build()
                 .map_err(|e| e.to_string())?;
 
+            let mut tick = 0;
+
             let mut event_pump = sdl_context.event_pump()?;
 
-            canvas.set_draw_color(Color::RGB(0, 0, 0));
-            canvas.clear();
-            canvas.present();
-            canvas.set_draw_color(Color::RGB(255, 255, 255));
-            mandelbrot::generate_window(
-                args[2].parse().map_err(|e: ParseIntError| e.to_string())?,
-                800/*WINDOW_WIDTH as i128*/,
-                WINDOW_HEIGHT as i128,
-                &mut canvas,
-            )?;
+
 
             'running: loop {
                 for event in event_pump.poll_iter() {
@@ -57,8 +50,30 @@ fn main() -> Result<(), String> {
                         _ => {}
                     }
                 }
-
+                canvas.set_draw_color(Color::RGB(0, 0, 0));
+                canvas.clear();
                 canvas.present();
+                canvas.set_draw_color(Color::RGB(255, 255, 255));
+                mandelbrot::generate_window(
+                    args[2].parse().map_err(|e: ParseIntError| e.to_string())?,
+                    800, /*WINDOW_WIDTH as i128*/
+                    WINDOW_HEIGHT as i128,
+                    &mut canvas,
+                )?;
+                canvas.present();
+
+                let window = canvas.window_mut();
+
+                let position = window.position();
+                let size = window.size();
+                let title = format!(
+                    "Window - pos({}x{}), size({}x{}): {}",
+                    position.0, position.1, size.0, size.1, tick
+                );
+
+                window.set_title(&title).map_err(|e| e.to_string())?;
+
+                tick += 1;
             }
         }
         "inset" => {
