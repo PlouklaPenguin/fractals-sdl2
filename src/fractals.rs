@@ -60,8 +60,8 @@ pub mod mandelbrot {
     use super::Complex;
     pub fn generate_window(
         depth: u32,
-        _screen_width: i128,
-        _screen_height: i128,
+        screen_width: u32,
+        screen_height: u32,
         canvas: &mut Canvas<Window>,
     ) -> Result<(), String> {
         //let screen_width = screen_width * 10_i128.pow(depth);
@@ -72,30 +72,29 @@ pub mod mandelbrot {
         // take distance on y axis (2) and multiply it by 2^x to expand it to an int
         let yrange: i32 = 2 * (2_i32.pow(depth));
         // -2 to 2
-        let xrange = 4 * (2_i32.pow(depth));
-        println!("xrange: {} yrange: {}", xrange, yrange);
+        let xrange: i32 = 2 * (2_i32.pow(depth));
+        //println!("xrange: {} yrange: {}", xrange, yrange);
 
-        // For every value in between -2 and 2
-        /*
-        TODO: Make the for loop such that it only draws points between 0 and 400 / 0 and 300
-        This needs to
-        */
         for x in -xrange..xrange {
-            for y in -yrange..yrange {
-                //if x < 0 && x >= -400 && y < 0 && y >= -300 {
+            for y in -(yrange / 2)..(yrange / 2) {
+                #[allow(clippy::collapsible_if)]
+                if x < screen_width as i32 / 2
+                    && x >= -(screen_width as i32)
+                    && y <= screen_height as i32 
+                    && y >= -(screen_height as i32 / 2)
+                {
                     if is_in_set(Complex::new(
                         (x as f64) / ((2_i128.pow(depth)) as f64),
                         (y as f64) / ((2_i128.pow(depth)) as f64),
                     )) {
-                        canvas.draw_point(((x ) as i32, (y ) as i32))?;
-                        if x == -2 && y == 0 {
+                        canvas.draw_point(((x + 400) as i32, (y + 300) as i32))?;
+                        /* if x == -2 && y == 0 {
                             println!("oh");
-                        }
+                        } */
                         //println!("x = {} y = {}", (x as f64), (y as f64));
                     }
-                    //canvas.present();
                 }
-            //}
+            }
         }
 
         Ok(())
