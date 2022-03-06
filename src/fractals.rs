@@ -64,7 +64,7 @@ pub mod mandelbrot {
         canvas: &mut Canvas<Window>,
         center: (i32, i32),
         zoom: u32,
-    ) -> Result<(), String> {
+        ) -> Result<(), String> {
         //let screen_width = screen_width * 10_i128.pow(depth);
         //println!("{}", screen_width);
         //let screen_height = screen_height * (10_i128.pow(depth));
@@ -77,20 +77,25 @@ pub mod mandelbrot {
         let xrange: i32 = 3 * (10_i32.pow(depth));
         //println!("xrange: {} yrange: {}", xrange, yrange); */
 
-        for x in -screen_width..screen_width {
-            for y in -screen_height..screen_height {
-                if is_in_set(Complex::new(
-                    (x as f64) / ((10_i128.pow(zoom)) as f64),
-                    (y as f64) / ((10_i128.pow(zoom)) as f64),
-                )) {
-                    canvas.draw_point((
-                        ((x as i32) + center.0),
-                        ((y as i32) + center.1),
-                    ))?;
-                    /* if x == -2 && y == 0 {
-                        println!("oh");
-                    } */
-                    //println!("x = {} y = {}", (x as f64), (y as f64));
+        println!("height: {}, width: {}", screen_height, screen_width);
+        
+        for x in (-screen_width / 2)..(screen_width / 2) {
+            for y in (-screen_height / 2)..(screen_height / 2) {
+                let centered_x = (x as i32) + center.0;
+                let centered_y = (y as i32) + center.1;
+                
+
+                if centered_x < screen_width && centered_y < screen_height {
+                    if is_in_set(Complex::new(
+                        (x as f64) / ((2_i128.pow(zoom)) as f64),
+                        (y as f64) / ((2_i128.pow(zoom)) as f64),
+                    )) {
+                        canvas.draw_point((((x as i32) + center.0), ((y as i32) + center.1)))?;
+                        /* if x == -2 && y == 0 {
+                            println!("oh");
+                        } */
+                        //println!("x = {} y = {}", (x as f64), (y as f64));
+                    }
                 }
             }
         }
@@ -100,7 +105,7 @@ pub mod mandelbrot {
     pub fn is_in_set(constant: Complex) -> bool {
         let mut e = Complex::new(0.0, 0.0) + constant;
 
-        for _i in 0..256 {
+        for _i in 0..1024 {
             e = mandel(e, constant);
             let d = e.squared_distance(Complex::new(0.0, 0.0));
             if d > 4.0 {

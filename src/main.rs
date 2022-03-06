@@ -64,7 +64,7 @@ fn main() -> Result<(), String> {
                     match event {
                         Event::MouseButtonDown { x, y, .. } => {
                             center = (x, y);
-
+                            println!("x: {}, y: {}", center.0, center.1);
                             canvas.set_draw_color(Color::RGB(0, 0, 0));
                             canvas.clear();
 
