@@ -38,7 +38,10 @@ fn main() -> Result<(), String> {
 
             let mut center = (400, 300);
 
-            let mut zoom = args[2].parse().map_err(|e: ParseIntError| e.to_string())?;
+            let zoom_inc: f64 = args[2]
+                .parse()
+                .map_err(|e: ParseFloatError| e.to_string())?;
+            let mut zoom = 1_f64;
 
             canvas.set_draw_color(Color::RGB(0, 0, 0));
             canvas.clear();
@@ -49,7 +52,7 @@ fn main() -> Result<(), String> {
                 WINDOW_HEIGHT as i32,
                 &mut canvas,
                 center,
-                zoom,
+                zoom
             )?;
 
             let mut event_pump = sdl_context.event_pump()?;
@@ -83,7 +86,7 @@ fn main() -> Result<(), String> {
                         } => break 'running,
                         Event::KeyDown { keycode, .. } => match keycode {
                             Some(Keycode::Equals) => {
-                                zoom += 1;
+                                zoom += zoom_inc;
                                 canvas.set_draw_color(Color::RGB(0, 0, 0));
                                 canvas.clear();
 
@@ -96,7 +99,7 @@ fn main() -> Result<(), String> {
                                 )?;
                             }
                             Some(Keycode::Minus) => {
-                                zoom -= 1;
+                                zoom -= zoom_inc;
 
                                 canvas.set_draw_color(Color::RGB(0, 0, 0));
                                 canvas.clear();

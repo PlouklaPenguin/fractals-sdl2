@@ -63,38 +63,31 @@ pub mod mandelbrot {
         screen_height: i32,
         canvas: &mut Canvas<Window>,
         center: (i32, i32),
-        zoom: u32,
-        ) -> Result<(), String> {
-        //let screen_width = screen_width * 10_i128.pow(depth);
-        //println!("{}", screen_width);
-        //let screen_height = screen_height * (10_i128.pow(depth));
+        zoom: f64,
+    ) -> Result<(), String> {
         canvas.set_draw_color(Color::RGB(255, 255, 255));
 
-        // * Don't think these are necessary
-        // take distance on y axis (2) and multiply it by 2^x to expand it to an int
-        /*         let yrange: i32 = 3 * (10_i32.pow(depth));
-        // -2 to 2
-        let xrange: i32 = 3 * (10_i32.pow(depth));
-        //println!("xrange: {} yrange: {}", xrange, yrange); */
+        println!(
+            "height: {:?}, width: {:?}",
+            -screen_height..screen_height,
+            -screen_width..screen_width
+        );
 
-        println!("height: {}, width: {}", screen_height, screen_width);
-        
-        for x in (-screen_width / 2)..(screen_width / 2) {
-            for y in (-screen_height / 2)..(screen_height / 2) {
+        let zoomed_divisor = 10_f64.powf(zoom) as f64;
+
+        for x in (-screen_width/* / 2 */)..(screen_width/* / 2 */) {
+            for y in (-screen_height/* / 2 */)..(screen_height/* / 2 */) {
                 let centered_x = (x as i32) + center.0;
                 let centered_y = (y as i32) + center.1;
-                
 
-                if centered_x < screen_width && centered_y < screen_height {
+                if (centered_x < screen_width - 10 && centered_x > 10)
+                    && (centered_y < screen_height - 10 && centered_y > 10)
+                {
                     if is_in_set(Complex::new(
-                        (x as f64) / ((2_i128.pow(zoom)) as f64),
-                        (y as f64) / ((2_i128.pow(zoom)) as f64),
+                        (x as f64) / zoomed_divisor,
+                        (y as f64) / zoomed_divisor,
                     )) {
                         canvas.draw_point((((x as i32) + center.0), ((y as i32) + center.1)))?;
-                        /* if x == -2 && y == 0 {
-                            println!("oh");
-                        } */
-                        //println!("x = {} y = {}", (x as f64), (y as f64));
                     }
                 }
             }
@@ -105,7 +98,7 @@ pub mod mandelbrot {
     pub fn is_in_set(constant: Complex) -> bool {
         let mut e = Complex::new(0.0, 0.0) + constant;
 
-        for _i in 0..1024 {
+        for _i in 0..16 {
             e = mandel(e, constant);
             let d = e.squared_distance(Complex::new(0.0, 0.0));
             if d > 4.0 {
