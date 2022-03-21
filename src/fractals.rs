@@ -58,6 +58,8 @@ pub mod mandelbrot {
     use sdl2::{pixels::Color, render::Canvas, video::Window};
 
     use super::Complex;
+
+    ///Draws all points on the screen within the Mandelbrot set, at a specific centre
     pub fn generate_window(
         screen_width: i32,
         screen_height: i32,
@@ -65,6 +67,11 @@ pub mod mandelbrot {
         center: (i32, i32),
         zoom: f64,
     ) -> Result<(), String> {
+
+        /*
+        TODO: Switch to GPU; enable movements by mouse-drag; colours?
+         */
+        
         canvas.set_draw_color(Color::RGB(255, 255, 255));
 
         println!(
@@ -95,10 +102,11 @@ pub mod mandelbrot {
 
         Ok(())
     }
+    /// Calculates if a complex number is in a set
     pub fn is_in_set(constant: Complex) -> bool {
         let mut e = Complex::new(0.0, 0.0) + constant;
 
-        for _i in 0..16 {
+        for _i in 0..32 {
             e = mandel(e, constant);
             let d = e.squared_distance(Complex::new(0.0, 0.0));
             if d > 4.0 {
@@ -108,6 +116,7 @@ pub mod mandelbrot {
         true
     }
 
+    /// The Mandelbrot Function
     fn mandel(i: Complex, constant: Complex) -> Complex {
         i.square() + constant
     }

@@ -3,11 +3,7 @@ extern crate sdl2;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use std::{
-    env,
-    num::{ParseFloatError, ParseIntError},
-    thread, time,
-};
+use std::{env, num::ParseFloatError, thread, time};
 
 mod fractals;
 use fractals::{mandelbrot, Complex};
@@ -52,7 +48,7 @@ fn main() -> Result<(), String> {
                 WINDOW_HEIGHT as i32,
                 &mut canvas,
                 center,
-                zoom
+                zoom,
             )?;
 
             let mut event_pump = sdl_context.event_pump()?;
