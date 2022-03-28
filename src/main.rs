@@ -32,7 +32,7 @@ fn main() -> Result<(), String> {
                 .build()
                 .map_err(|e| e.to_string())?;
 
-            let mut center = (400, 300);
+            let mut mouse_loc = (400, 300);
 
             let zoom_inc: f64 = args[2]
                 .parse()
@@ -47,11 +47,13 @@ fn main() -> Result<(), String> {
                 WINDOW_WIDTH as i32,
                 WINDOW_HEIGHT as i32,
                 &mut canvas,
-                center,
+                mouse_loc,
                 zoom,
             )?;
 
+
             let mut event_pump = sdl_context.event_pump()?;
+            
 
             'running: loop {
                 let now = time::Instant::now();
@@ -62,8 +64,8 @@ fn main() -> Result<(), String> {
                 for event in event_pump.poll_iter() {
                     match event {
                         Event::MouseButtonDown { x, y, .. } => {
-                            center = (x, y);
-                            println!("x: {}, y: {}", center.0, center.1);
+                            mouse_loc = (x, y);
+                            println!("x: {}, y: {}", mouse_loc.0, mouse_loc.1);
                             canvas.set_draw_color(Color::RGB(0, 0, 0));
                             canvas.clear();
 
@@ -71,7 +73,7 @@ fn main() -> Result<(), String> {
                                 size.0 as i32,
                                 size.1 as i32,
                                 &mut canvas,
-                                center,
+                                mouse_loc,
                                 zoom,
                             )?;
                         }
@@ -90,7 +92,7 @@ fn main() -> Result<(), String> {
                                     size.0 as i32,
                                     size.1 as i32,
                                     &mut canvas,
-                                    center,
+                                    mouse_loc,
                                     zoom,
                                 )?;
                             }
@@ -104,12 +106,15 @@ fn main() -> Result<(), String> {
                                     size.0 as i32,
                                     size.1 as i32,
                                     &mut canvas,
-                                    center,
+                                    mouse_loc,
                                     zoom,
                                 )?;
                             }
                             _ => (),
                         },
+                        Event::MouseMotion { x, y, .. } => {
+                            mouse_loc = (x, y);
+                        }
                         _ => {}
                     }
                 }

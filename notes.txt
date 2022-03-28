@@ -1,0 +1,13 @@
+
+
+Reletive zooming such that the distance between the centre (or mouse loc, not sure) of the fractal and the
+centre of the screen scales with zoom level
+
+    Current
+        when zooming in, I divide all points between the screen edges by the zoom level, calculate those, then
+        multiply them by the zoom level again, add the mouse loc and render that
+
+    Objective:
+        Scale the addition section by the zoom level so that it gets further away from the centre
+        as it zooms in, so I am always zoomed in on the same section
+ 

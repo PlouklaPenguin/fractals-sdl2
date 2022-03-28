@@ -67,11 +67,10 @@ pub mod mandelbrot {
         center: (i32, i32),
         zoom: f64,
     ) -> Result<(), String> {
-
         /*
         TODO: Switch to GPU; enable movements by mouse-drag; colours?
          */
-        
+
         canvas.set_draw_color(Color::RGB(255, 255, 255));
 
         println!(
@@ -90,12 +89,7 @@ pub mod mandelbrot {
                 if (centered_x < screen_width - 10 && centered_x > 10)
                     && (centered_y < screen_height - 10 && centered_y > 10)
                 {
-                    if is_in_set(Complex::new(
-                        (x as f64) / zoomed_divisor,
-                        (y as f64) / zoomed_divisor,
-                    )) {
-                        canvas.draw_point((((x as i32) + center.0), ((y as i32) + center.1)))?;
-                    }
+                    draw(x, y, canvas, center, zoomed_divisor)?;
                 }
             }
         }
@@ -119,5 +113,21 @@ pub mod mandelbrot {
     /// The Mandelbrot Function
     fn mandel(i: Complex, constant: Complex) -> Complex {
         i.square() + constant
+    }
+
+    fn draw(
+        x: i32,
+        y: i32,
+        canvas: &mut Canvas<Window>,
+        center: (i32, i32),
+        zoomed_divisor: f64,
+    ) -> Result<(), String> {
+        if is_in_set(Complex::new(
+            x as f64 / zoomed_divisor,
+            y as f64 / zoomed_divisor,
+        )) {
+            canvas.draw_point((x + center.0, y + center.1))?;
+        }
+        Ok(())
     }
 }
