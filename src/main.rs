@@ -51,9 +51,7 @@ fn main() -> Result<(), String> {
                 zoom,
             )?;
 
-
             let mut event_pump = sdl_context.event_pump()?;
-            
 
             'running: loop {
                 let now = time::Instant::now();
@@ -112,8 +110,23 @@ fn main() -> Result<(), String> {
                             }
                             _ => (),
                         },
-                        Event::MouseMotion { x, y, .. } => {
-                            mouse_loc = (x, y);
+                        Event::MouseMotion {
+                            x, y, mousestate, ..
+                        } => {
+                            if mousestate.left() {
+                                mouse_loc = (x, y);
+
+                                canvas.set_draw_color(Color::RGB(0, 0, 0));
+                                canvas.clear();
+
+                                mandelbrot::generate_window(
+                                    size.0 as i32,
+                                    size.1 as i32,
+                                    &mut canvas,
+                                    mouse_loc,
+                                    zoom,
+                                )?;
+                            }
                         }
                         _ => {}
                     }
