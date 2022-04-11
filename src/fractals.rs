@@ -55,6 +55,8 @@ mod custom_draw {
 */
 
 pub mod mandelbrot {
+    use std::num::TryFromIntError;
+
     use sdl2::{pixels::Color, render::Canvas, video::Window};
 
     use super::Complex;
@@ -64,8 +66,8 @@ pub mod mandelbrot {
         screen_width: i32,
         screen_height: i32,
         canvas: &mut Canvas<Window>,
-        center: (i32, i32),
-        zoom: f64,
+        mouse_loc: (i32, i32),
+        zoom: i32,
     ) -> Result<(), String> {
         /*
         TODO: Switch to GPU; enable movements by mouse-drag; colours?
@@ -79,17 +81,21 @@ pub mod mandelbrot {
             -screen_width..screen_width
         );
 
-        let zoomed_divisor = 10_f64.powf(zoom) as f64;
+
+        let zoomed_divisor = 10_i32.pow(zoom.try_into().map_err(|e: TryFromIntError| e.to_string())?);
+
+
+        let mouse_loc = (mouse_loc.0 * 2, mouse_loc.1 * 2);
 
         for x in (-screen_width/* / 2 */)..(screen_width/* / 2 */) {
             for y in (-screen_height/* / 2 */)..(screen_height/* / 2 */) {
-                let centered_x = (x as i32) + center.0;
-                let centered_y = (y as i32) + center.1;
+                let centered_x = (x as i32) + mouse_loc.0;
+                let centered_y = (y as i32) + mouse_loc.1;
 
                 if (centered_x < screen_width - 10 && centered_x > 10)
                     && (centered_y < screen_height - 10 && centered_y > 10)
                 {
-                    draw(x, y, canvas, center, zoomed_divisor)?;
+                    draw(x, y, canvas, mouse_loc, zoomed_divisor)?;
                 }
             }
         }
@@ -120,11 +126,11 @@ pub mod mandelbrot {
         y: i32,
         canvas: &mut Canvas<Window>,
         center: (i32, i32),
-        zoomed_divisor: f64,
+        zoomed_divisor: i32,
     ) -> Result<(), String> {
         if is_in_set(Complex::new(
-            x as f64 / zoomed_divisor,
-            y as f64 / zoomed_divisor,
+            x as f64 / zoomed_divisor as f64,
+            y as f64 / zoomed_divisor as f64,
         )) {
             canvas.draw_point((x + center.0, y + center.1))?;
         }
