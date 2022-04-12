@@ -3,7 +3,7 @@ extern crate sdl2;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use std::{env, num::{ ParseIntError, ParseFloatError }, thread, time};
+use std::{env, num::ParseFloatError, thread, time};
 
 mod fractals;
 use fractals::{mandelbrot, Complex};
@@ -32,12 +32,12 @@ fn main() -> Result<(), String> {
                 .build()
                 .map_err(|e| e.to_string())?;
 
-            let mut mouse_loc = (400, 300);
+            let mut mouse_loc = ((WINDOW_WIDTH / 2) as i32, (WINDOW_HEIGHT / 2) as i32);
 
-            let zoom_inc: i32 = args[2]
+            let zoom_inc: f32 = args[2]
                 .parse()
-                .map_err(|e: ParseIntError| e.to_string())?;
-            let mut zoom = 1_i32;
+                .map_err(|e: ParseFloatError| e.to_string())?;
+            let mut zoom = 2.5_f32;
 
             canvas.set_draw_color(Color::RGB(0, 0, 0));
             canvas.clear();
@@ -53,6 +53,9 @@ fn main() -> Result<(), String> {
 
             let mut event_pump = sdl_context.event_pump()?;
 
+            let mut mouse_down = false;
+            let mut og_loc = (WINDOW_WIDTH as i32 / 2, WINDOW_HEIGHT as i32 / 2);
+
             'running: loop {
                 let now = time::Instant::now();
 
@@ -62,18 +65,27 @@ fn main() -> Result<(), String> {
                 for event in event_pump.poll_iter() {
                     match event {
                         Event::MouseButtonDown { x, y, .. } => {
-                            mouse_loc = (x, y);
-                            println!("x: {}, y: {}", mouse_loc.0, mouse_loc.1);
-                            canvas.set_draw_color(Color::RGB(0, 0, 0));
-                            canvas.clear();
+                            //mouse_loc = (x, y);
+                            //println!("x: {}, y: {}", mouse_loc.0, mouse_loc.1);
+                            //canvas.set_draw_color(Color::RGB(0, 0, 0));
+                            //canvas.clear();
 
-                            mandelbrot::generate_window(
+                            /* mandelbrot::generate_window(
                                 size.0 as i32,
                                 size.1 as i32,
                                 &mut canvas,
                                 mouse_loc,
                                 zoom,
-                            )?;
+                            )?; */
+                            
+                            mouse_down = true;
+                            og_loc = (x, y);
+                            
+                        },
+                        Event::MouseButtonUp {
+                            x, y, ..
+                        } => {
+                           let current_loc = (x, y);
                         }
                         Event::Quit { .. }
                         | Event::KeyDown {
@@ -110,24 +122,6 @@ fn main() -> Result<(), String> {
                             }
                             _ => (),
                         },
-                        Event::MouseMotion {
-                            x, y, mousestate, ..
-                        } => {
-                            if mousestate.left() {
-                                mouse_loc = (x, y);
-
-                                canvas.set_draw_color(Color::RGB(0, 0, 0));
-                                canvas.clear();
-
-                                mandelbrot::generate_window(
-                                    size.0 as i32,
-                                    size.1 as i32,
-                                    &mut canvas,
-                                    mouse_loc,
-                                    zoom,
-                                )?;
-                            }
-                        }
                         _ => {}
                     }
                 }

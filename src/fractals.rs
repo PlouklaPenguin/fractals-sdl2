@@ -32,7 +32,7 @@ impl Complex {
         Complex::new((self.r.powi(2)) - (self.i.powi(2)), 2.0 * self.r * self.i)
     }
 
-    pub fn squared_distance(&self, b: Self) -> f64 {
+    pub fn sq_distance_compl(&self, b: Self) -> f64 {
         (self.r + b.r).powi(2) + (self.i + b.i).powi(2)
     }
 }
@@ -54,8 +54,10 @@ mod custom_draw {
 }
 */
 
+
+
 pub mod mandelbrot {
-    use std::num::TryFromIntError;
+    //use std::num::TryFromIntError;
 
     use sdl2::{pixels::Color, render::Canvas, video::Window};
 
@@ -67,40 +69,47 @@ pub mod mandelbrot {
         screen_height: i32,
         canvas: &mut Canvas<Window>,
         mouse_loc: (i32, i32),
-        zoom: i32,
-    ) -> Result<(), String> {
+        zoom: f32,
+    ) -> Result<(i32, i32), String> {
         /*
         TODO: Switch to GPU; enable movements by mouse-drag; colours?
          */
 
         canvas.set_draw_color(Color::RGB(255, 255, 255));
 
-        println!(
-            "height: {:?}, width: {:?}",
-            -screen_height..screen_height,
-            -screen_width..screen_width
+        let screen_centre = (screen_width / 2, screen_height / 2);
+
+
+        let zoomed_divisor = 10_f32.powf(
+            zoom/*.try_into()
+                .map_err(|e: TryFromIntError| e.to_string())?,*/
         );
 
+        let frac_centre = (
+            2 * screen_centre.0 + -mouse_loc.0,
+            2 * screen_centre.1 + -mouse_loc.1,
+        );
 
-        let zoomed_divisor = 10_i32.pow(zoom.try_into().map_err(|e: TryFromIntError| e.to_string())?);
-
-
-        let mouse_loc = (mouse_loc.0 * 2, mouse_loc.1 * 2);
+        println!("centre: {:?} mouse_loc: {:?} frac_centre: {:?}", screen_centre, mouse_loc, frac_centre);
+        /*let mouse_loc = (
+            (mouse_loc.0 - (screen_width / 2)) * -zoom + (screen_width / 2),
+            (mouse_loc.1 - (screen_height / 2)) * -zoom + (screen_height / 2),
+        );*/
 
         for x in (-screen_width/* / 2 */)..(screen_width/* / 2 */) {
             for y in (-screen_height/* / 2 */)..(screen_height/* / 2 */) {
-                let centered_x = (x as i32) + mouse_loc.0;
-                let centered_y = (y as i32) + mouse_loc.1;
+                let centered_x = (x as i32) + frac_centre.0;
+                let centered_y = (y as i32) + frac_centre.1;
 
                 if (centered_x < screen_width - 10 && centered_x > 10)
                     && (centered_y < screen_height - 10 && centered_y > 10)
                 {
-                    draw(x, y, canvas, mouse_loc, zoomed_divisor)?;
+                    draw(x, y, canvas, frac_centre, zoomed_divisor)?;
                 }
             }
         }
 
-        Ok(())
+        Ok(frac_centre)
     }
     /// Calculates if a complex number is in a set
     pub fn is_in_set(constant: Complex) -> bool {
@@ -108,7 +117,7 @@ pub mod mandelbrot {
 
         for _i in 0..32 {
             e = mandel(e, constant);
-            let d = e.squared_distance(Complex::new(0.0, 0.0));
+            let d = e.sq_distance_compl(Complex::new(0.0, 0.0));
             if d > 4.0 {
                 return false;
             }
@@ -125,14 +134,14 @@ pub mod mandelbrot {
         x: i32,
         y: i32,
         canvas: &mut Canvas<Window>,
-        center: (i32, i32),
-        zoomed_divisor: i32,
+        mouse_loc: (i32, i32),
+        zoomed_divisor: f32,
     ) -> Result<(), String> {
         if is_in_set(Complex::new(
             x as f64 / zoomed_divisor as f64,
             y as f64 / zoomed_divisor as f64,
         )) {
-            canvas.draw_point((x + center.0, y + center.1))?;
+            canvas.draw_point((x + mouse_loc.0, y + mouse_loc.1))?;
         }
         Ok(())
     }

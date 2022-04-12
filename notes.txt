@@ -4,10 +4,26 @@ Reletive zooming such that the distance between the centre (or mouse loc, not su
 centre of the screen scales with zoom level
 
     Current
-        when zooming in, I divide all points between the screen edges by the zoom level, calculate those, then
+        when zooming in, I divide all points between the negative and positive screen edges by the zoom level, calculate those, then
         multiply them by the zoom level again, add the mouse loc and render that
 
     Objective:
         Scale the addition section by the zoom level so that it gets further away from the centre
         as it zooms in, so I am always zoomed in on the same section
  
+Find releative position from centre of fractal to the mouse_loc:
+    cONST fractal distance (maybe depending on zoom level)
+    Keep distance constant by adding that to every mouse loc
+
+
+
+Get distance between mouse and centre of the fractal:
+    add that - of that distance to the screen centre and set the fractal centre there
+
+    additionally, I need to treat the fractal centre as the real center, and modify it by the other points.
+    I need the offset from sc_centre to stay the same so that when I click on a part of the fractal, it moves the fractal
+    centre by the distance to the fractal center, I think.
+
+
+
+Store the fractal so when moving I don't have to render it multiple times
