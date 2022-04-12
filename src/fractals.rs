@@ -85,7 +85,6 @@ pub mod mandelbrot {
         let zoomed_divisor = 10_i32.pow(zoom.try_into().map_err(|e: TryFromIntError| e.to_string())?);
 
 
-        let mouse_loc = (mouse_loc.0 * 2, mouse_loc.1 * 2);
 
         for x in (-screen_width/* / 2 */)..(screen_width/* / 2 */) {
             for y in (-screen_height/* / 2 */)..(screen_height/* / 2 */) {
