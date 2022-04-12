@@ -68,7 +68,8 @@ pub mod mandelbrot {
         screen_width: i32,
         screen_height: i32,
         canvas: &mut Canvas<Window>,
-        mouse_loc: (i32, i32),
+        current_loc: (i32, i32),
+        og_loc: (i32, i32),
         zoom: f32,
     ) -> Result<(i32, i32), String> {
         /*
@@ -86,11 +87,11 @@ pub mod mandelbrot {
         );
 
         let frac_centre = (
-            2 * screen_centre.0 + -mouse_loc.0,
-            2 * screen_centre.1 + -mouse_loc.1,
+            2 * screen_centre.0 + -current_loc.0,
+            2 * screen_centre.1 + -current_loc.1,
         );
 
-        println!("centre: {:?} mouse_loc: {:?} frac_centre: {:?}", screen_centre, mouse_loc, frac_centre);
+        println!("centre: {:?} mouse_loc: {:?} frac_centre: {:?}", screen_centre, current_loc, frac_centre);
         /*let mouse_loc = (
             (mouse_loc.0 - (screen_width / 2)) * -zoom + (screen_width / 2),
             (mouse_loc.1 - (screen_height / 2)) * -zoom + (screen_height / 2),

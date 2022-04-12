@@ -43,18 +43,20 @@ fn main() -> Result<(), String> {
             canvas.clear();
             canvas.set_draw_color(Color::RGB(255, 255, 255));
 
+            let mut og_loc = (WINDOW_WIDTH as i32 / 2, WINDOW_HEIGHT as i32 / 2);
+
             mandelbrot::generate_window(
                 WINDOW_WIDTH as i32,
                 WINDOW_HEIGHT as i32,
                 &mut canvas,
                 mouse_loc,
+                og_loc,
                 zoom,
             )?;
 
             let mut event_pump = sdl_context.event_pump()?;
 
             let mut mouse_down = false;
-            let mut og_loc = (WINDOW_WIDTH as i32 / 2, WINDOW_HEIGHT as i32 / 2);
 
             'running: loop {
                 let now = time::Instant::now();
@@ -77,15 +79,21 @@ fn main() -> Result<(), String> {
                                 mouse_loc,
                                 zoom,
                             )?; */
-                            
+
                             mouse_down = true;
                             og_loc = (x, y);
-                            
-                        },
-                        Event::MouseButtonUp {
-                            x, y, ..
-                        } => {
-                           let current_loc = (x, y);
+                        }
+                        Event::MouseButtonUp { x, y, .. } => {
+                            let current_loc = (x, y);
+
+                            mandelbrot::generate_window(
+                                size.0 as i32,
+                                size.1 as i32,
+                                &mut canvas,
+                                mouse_loc,
+                                og_loc,
+                                zoom,
+                            )?;
                         }
                         Event::Quit { .. }
                         | Event::KeyDown {
@@ -103,6 +111,7 @@ fn main() -> Result<(), String> {
                                     size.1 as i32,
                                     &mut canvas,
                                     mouse_loc,
+                                    og_loc,
                                     zoom,
                                 )?;
                             }
@@ -117,6 +126,7 @@ fn main() -> Result<(), String> {
                                     size.1 as i32,
                                     &mut canvas,
                                     mouse_loc,
+                                    og_loc,
                                     zoom,
                                 )?;
                             }
