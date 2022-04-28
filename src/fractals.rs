@@ -54,8 +54,6 @@ mod custom_draw {
 }
 */
 
-
-
 pub mod mandelbrot {
     //use std::num::TryFromIntError;
 
@@ -63,54 +61,76 @@ pub mod mandelbrot {
 
     use super::Complex;
 
+    #[derive(PartialEq)]
+    pub struct MandelbrotRender {
+        screen_width: i32,
+        screen_height: i32,
+        loc: (i32, i32),
+        zoom: f32,
+    }
+
+    impl MandelbrotRender {
+        pub fn new(screen_width: i32, screen_height: i32, loc: (i32, i32), zoom: f32) -> Self {
+            MandelbrotRender {
+                screen_width,
+                screen_height,
+                loc,
+                zoom,
+            }
+        }
+    }
+
     ///Draws all points on the screen within the Mandelbrot set, at a specific centre
     pub fn generate_window(
         screen_width: i32,
         screen_height: i32,
         canvas: &mut Canvas<Window>,
         current_loc: (i32, i32),
-        og_loc: (i32, i32),
         zoom: f32,
-    ) -> Result<(i32, i32), String> {
+        past_mandelbrot: &MandelbrotRender,
+    ) -> Result<MandelbrotRender, String> {
         /*
         TODO: Switch to GPU; enable movements by mouse-drag; colours?
          */
+        let current = MandelbrotRender::new(screen_width, screen_width, current_loc, zoom);
+        if current != *past_mandelbrot {
+            canvas.set_draw_color(Color::RGB(255, 255, 255));
 
-        canvas.set_draw_color(Color::RGB(255, 255, 255));
+            let screen_centre = (screen_width / 2, screen_height / 2);
 
-        let screen_centre = (screen_width / 2, screen_height / 2);
+            let zoomed_divisor = 10_f32.powf(
+                zoom, /*.try_into()
+                     .map_err(|e: TryFromIntError| e.to_string())?,*/
+            );
 
+            let frac_centre = (
+                2 * screen_centre.0 + -current_loc.0,
+                2 * screen_centre.1 + -current_loc.1,
+            );
 
-        let zoomed_divisor = 10_f32.powf(
-            zoom/*.try_into()
-                .map_err(|e: TryFromIntError| e.to_string())?,*/
-        );
+            println!(
+                "centre: {:?} mouse_loc: {:?} frac_centre: {:?}",
+                screen_centre, current_loc, frac_centre
+            );
+            /*let mouse_loc = (
+                (mouse_loc.0 - (screen_width / 2)) * -zoom + (screen_width / 2),
+                (mouse_loc.1 - (screen_height / 2)) * -zoom + (screen_height / 2),
+            );*/
 
-        let frac_centre = (
-            2 * screen_centre.0 + -current_loc.0,
-            2 * screen_centre.1 + -current_loc.1,
-        );
+            for x in (-screen_width/* / 2 */)..(screen_width/* / 2 */) {
+                for y in (-screen_height/* / 2 */)..(screen_height/* / 2 */) {
+                    let centered_x = (x as i32) + frac_centre.0;
+                    let centered_y = (y as i32) + frac_centre.1;
 
-        println!("centre: {:?} mouse_loc: {:?} frac_centre: {:?}", screen_centre, current_loc, frac_centre);
-        /*let mouse_loc = (
-            (mouse_loc.0 - (screen_width / 2)) * -zoom + (screen_width / 2),
-            (mouse_loc.1 - (screen_height / 2)) * -zoom + (screen_height / 2),
-        );*/
-
-        for x in (-screen_width/* / 2 */)..(screen_width/* / 2 */) {
-            for y in (-screen_height/* / 2 */)..(screen_height/* / 2 */) {
-                let centered_x = (x as i32) + frac_centre.0;
-                let centered_y = (y as i32) + frac_centre.1;
-
-                if (centered_x < screen_width - 10 && centered_x > 10)
-                    && (centered_y < screen_height - 10 && centered_y > 10)
-                {
-                    draw(x, y, canvas, frac_centre, zoomed_divisor)?;
+                    if (centered_x < screen_width - 10 && centered_x > 10)
+                        && (centered_y < screen_height - 10 && centered_y > 10)
+                    {
+                        draw(x, y, canvas, frac_centre, zoomed_divisor)?;
+                    }
                 }
             }
         }
-
-        Ok(frac_centre)
+        Ok(current)
     }
     /// Calculates if a complex number is in a set
     pub fn is_in_set(constant: Complex) -> bool {

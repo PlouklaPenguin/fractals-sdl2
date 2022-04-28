@@ -45,13 +45,21 @@ fn main() -> Result<(), String> {
 
             let mut og_loc = (WINDOW_WIDTH as i32 / 2, WINDOW_HEIGHT as i32 / 2);
 
-            mandelbrot::generate_window(
+            // TODO:: Change to mut
+            let mut past_mandelbrot = mandelbrot::MandelbrotRender::new(
+                WINDOW_WIDTH as i32,
+                WINDOW_HEIGHT as i32,
+                mouse_loc,
+                zoom,
+            );
+
+            past_mandelbrot = mandelbrot::generate_window(
                 WINDOW_WIDTH as i32,
                 WINDOW_HEIGHT as i32,
                 &mut canvas,
                 mouse_loc,
-                og_loc,
                 zoom,
+                &past_mandelbrot,
             )?;
 
             let mut event_pump = sdl_context.event_pump()?;
@@ -91,8 +99,8 @@ fn main() -> Result<(), String> {
                                 size.1 as i32,
                                 &mut canvas,
                                 mouse_loc,
-                                og_loc,
                                 zoom,
+                                &past_mandelbrot
                             )?;
                         }
                         Event::Quit { .. }
@@ -111,8 +119,8 @@ fn main() -> Result<(), String> {
                                     size.1 as i32,
                                     &mut canvas,
                                     mouse_loc,
-                                    og_loc,
                                     zoom,
+                                    &past_mandelbrot,
                                 )?;
                             }
                             Some(Keycode::Minus) => {
@@ -126,8 +134,8 @@ fn main() -> Result<(), String> {
                                     size.1 as i32,
                                     &mut canvas,
                                     mouse_loc,
-                                    og_loc,
                                     zoom,
+                                    &past_mandelbrot,
                                 )?;
                             }
                             _ => (),
