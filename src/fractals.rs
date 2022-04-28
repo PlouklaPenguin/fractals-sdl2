@@ -109,8 +109,9 @@ pub mod mandelbrot {
             );
 
             println!(
-                "centre: {:?} mouse_loc: {:?} frac_centre: {:?}",
-                screen_centre, current_loc, frac_centre
+                "past loc: {:?}, current loc: {:?}",
+                past_mandelbrot.loc,
+                current_loc
             );
             /*let mouse_loc = (
                 (mouse_loc.0 - (screen_width / 2)) * -zoom + (screen_width / 2),

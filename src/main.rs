@@ -75,30 +75,13 @@ fn main() -> Result<(), String> {
                 for event in event_pump.poll_iter() {
                     match event {
                         Event::MouseButtonDown { x, y, .. } => {
-                            //mouse_loc = (x, y);
-                            //println!("x: {}, y: {}", mouse_loc.0, mouse_loc.1);
-                            //canvas.set_draw_color(Color::RGB(0, 0, 0));
-                            //canvas.clear();
-
-                            /* mandelbrot::generate_window(
-                                size.0 as i32,
-                                size.1 as i32,
-                                &mut canvas,
-                                mouse_loc,
-                                zoom,
-                            )?; */
-
-                            mouse_down = true;
-                            og_loc = (x, y);
-                        }
-                        Event::MouseButtonUp { x, y, .. } => {
                             let current_loc = (x, y);
 
-                            mandelbrot::generate_window(
+                            past_mandelbrot = mandelbrot::generate_window(
                                 size.0 as i32,
                                 size.1 as i32,
                                 &mut canvas,
-                                mouse_loc,
+                                current_loc,
                                 zoom,
                                 &past_mandelbrot
                             )?;
