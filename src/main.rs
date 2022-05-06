@@ -6,7 +6,7 @@ use sdl2::pixels::Color;
 use std::{env, num::ParseFloatError, thread, time};
 
 mod fractals;
-use fractals::{mandelbrot, Complex};
+use fractals::{mandelbrot, math::Complex};
 
 static WINDOW_WIDTH: u32 = 800;
 static WINDOW_HEIGHT: u32 = 600;
@@ -32,7 +32,7 @@ fn main() -> Result<(), String> {
                 .build()
                 .map_err(|e| e.to_string())?;
 
-            let mut mouse_loc = ((WINDOW_WIDTH / 2) as i32, (WINDOW_HEIGHT / 2) as i32);
+            let mouse_loc = ((WINDOW_WIDTH / 2) as i32, (WINDOW_HEIGHT / 2) as i32);
 
             let zoom_inc: f32 = args[2]
                 .parse()
@@ -42,8 +42,6 @@ fn main() -> Result<(), String> {
             canvas.set_draw_color(Color::RGB(0, 0, 0));
             canvas.clear();
             canvas.set_draw_color(Color::RGB(255, 255, 255));
-
-            let mut og_loc = (WINDOW_WIDTH as i32 / 2, WINDOW_HEIGHT as i32 / 2);
 
             // TODO:: Change to mut
             let mut past_mandelbrot = mandelbrot::MandelbrotRender::new(
@@ -64,8 +62,6 @@ fn main() -> Result<(), String> {
 
             let mut event_pump = sdl_context.event_pump()?;
 
-            let mut mouse_down = false;
-
             'running: loop {
                 let now = time::Instant::now();
 
@@ -75,6 +71,8 @@ fn main() -> Result<(), String> {
                 for event in event_pump.poll_iter() {
                     match event {
                         Event::MouseButtonDown { x, y, .. } => {
+                            canvas.set_draw_color(Color::RGB(0, 0, 0));
+                            canvas.clear();
                             let current_loc = (x, y);
 
                             past_mandelbrot = mandelbrot::generate_window(
@@ -83,7 +81,7 @@ fn main() -> Result<(), String> {
                                 &mut canvas,
                                 current_loc,
                                 zoom,
-                                &past_mandelbrot
+                                &past_mandelbrot,
                             )?;
                         }
                         Event::Quit { .. }
