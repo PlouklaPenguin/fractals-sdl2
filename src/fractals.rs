@@ -98,6 +98,7 @@ pub mod mandelbrot {
     ) -> Result<MandelbrotRender, String> {
         /*
         TODO: Switch to GPU; enable movements by mouse-drag; colours?
+        TODO: Also, get back to stable and work from there. My current progress is spaghetti
          */
         let current = MandelbrotRender::new(screen_width, screen_width, current_loc, zoom);
         if current != *past_mandelbrot {
