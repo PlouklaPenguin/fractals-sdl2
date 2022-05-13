@@ -3,7 +3,11 @@ extern crate sdl2;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use std::{env, num::{ ParseIntError, ParseFloatError }, thread, time};
+use std::{
+    env,
+    num::{ParseFloatError, ParseIntError},
+    thread, time,
+};
 
 mod fractals;
 use fractals::{mandelbrot, Complex};
@@ -34,10 +38,8 @@ fn main() -> Result<(), String> {
 
             let mut mouse_loc = (400, 300);
 
-            let zoom_inc: i32 = args[2]
-                .parse()
-                .map_err(|e: ParseIntError| e.to_string())?;
-            let mut zoom = 1_i32;
+            let zoom_inc: u32 = args[2].parse().map_err(|e: ParseIntError| e.to_string())?;
+            let mut zoom = 1;
 
             canvas.set_draw_color(Color::RGB(0, 0, 0));
             canvas.clear();

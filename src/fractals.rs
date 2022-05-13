@@ -55,7 +55,6 @@ mod custom_draw {
 */
 
 pub mod mandelbrot {
-    use std::num::TryFromIntError;
 
     use sdl2::{pixels::Color, render::Canvas, video::Window};
 
@@ -67,24 +66,11 @@ pub mod mandelbrot {
         screen_height: i32,
         canvas: &mut Canvas<Window>,
         mouse_loc: (i32, i32),
-        zoom: i32,
+        zoom: u32,
     ) -> Result<(), String> {
-        /*
-        TODO: Switch to GPU; enable movements by mouse-drag; colours?
-         */
-
         canvas.set_draw_color(Color::RGB(255, 255, 255));
 
-        println!(
-            "height: {:?}, width: {:?}",
-            -screen_height..screen_height,
-            -screen_width..screen_width
-        );
-
-
-        let zoomed_divisor = 10_i32.pow(zoom.try_into().map_err(|e: TryFromIntError| e.to_string())?);
-
-
+        let zoomed_divisor = 10_i32.pow(zoom);
 
         for x in (-screen_width/* / 2 */)..(screen_width/* / 2 */) {
             for y in (-screen_height/* / 2 */)..(screen_height/* / 2 */) {
